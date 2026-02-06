@@ -8,6 +8,7 @@ app.use(cors());
 // --- DATABASE TETEP SAMA ---
 const databaseGame = [
     { pertanyaan: "🇮🇩", jawaban: "Indonesia", hint: "Negara kepulauan terbesar" },
+    { pertanyaan: "🇲🇾", jawaban: "Malaysia", hint: "Rata-rata Indonesia" },
     { pertanyaan: "🇯🇵", jawaban: "Jepang", hint: "Negara Matahari Terbit" }
 ];
 
