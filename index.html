@@ -3,68 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twin API Dashboard</title>
+    <title>Twin Dev API | Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background: #121212; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .card { background: #1e1e1e; border: 1px solid #333; color: white; border-radius: 15px; }
-        .btn-primary { background: #6f42c1; border: none; }
-        .btn-primary:hover { background: #5a32a3; }
-        code { color: #f8f9fa; background: #333; padding: 2px 5px; border-radius: 4px; }
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .navbar { background-color: #1e293b; border-bottom: 1px solid #334155; }
+        .card-stat { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; transition: 0.3s; }
+        .card-stat:hover { border-color: #38bdf8; }
+        .badge-status { background: #22c55e; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; }
+        code { color: #38bdf8; }
     </style>
 </head>
 <body>
 
-<div class="container mt-5">
-    <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold">Twin <span class="text-primary">Dev</span> API</h1>
-        <p class="lead">Pusat API Game & Tools Gratis 100%</p>
+<nav class="navbar navbar-dark mb-4">
+    <div class="container">
+        <span class="navbar-brand mb-0 h1 fw-bold">TWIN <span class="text-info">DEV</span> API</span>
+        <span class="badge-status">System Online</span>
     </div>
+</nav>
 
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card p-4 shadow">
-                <h3 class="text-center">🎮 Tebak Bendera</h3>
-                <div id="bendera" class="text-center my-3" style="font-size: 80px;">❓</div>
-                <p id="hint" class="text-center text-secondary">Klik Ambil Soal</p>
-                
-                <div class="input-group mb-3">
-                    <input type="text" id="jawabanInput" class="form-control bg-dark text-white border-secondary" placeholder="Jawaban...">
-                    <button onclick="jawabSoal()" class="btn btn-primary">Kirim</button>
-                </div>
-                
-                <button onclick="ambilSoal()" class="btn btn-outline-light w-100 mb-3">Ambil Soal</button>
-                <div id="hasil" class="text-center fw-bold"></div>
-                
-                <hr class="border-secondary">
-                <small class="text-secondary">Endpoint: <code>/api/tebak-bendera</code></small>
+<div class="container">
+    <div class="row g-4 mb-5 text-center">
+        <div class="col-6 col-md-3">
+            <div class="card-stat">
+                <small class="text-secondary">Requests</small>
+                <h3 id="reqCount">0</h3>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card-stat">
+                <small class="text-secondary">Runtime</small>
+                <h3 id="runtime">0m</h3>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card-stat">
+                <small class="text-secondary">RAM</small>
+                <h3 id="ramUsage">0MB</h3>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card-stat">
+                <small class="text-secondary">Features</small>
+                <h3>2</h3>
             </div>
         </div>
     </div>
+
+    <h4 class="mb-3 fw-bold">Daftar Fitur (REST API)</h4>
+    <div class="card-stat mb-4">
+        <table class="table table-dark table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Fitur</th>
+                    <th>Method</th>
+                    <th>Endpoint</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Tebak Bendera</td>
+                    <td><span class="badge bg-success">GET</span></td>
+                    <td><code>/api/tebak-bendera</code></td>
+                    <td><a href="/api/tebak-bendera" class="btn btn-sm btn-info">Cek</a></td>
+                </tr>
+                <tr>
+                    <td>Cek Jawaban</td>
+                    <td><span class="badge bg-success">GET</span></td>
+                    <td><code>/api/jawab?tebakan=...</code></td>
+                    <td><button class="btn btn-sm btn-outline-info">Info</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
-    
 
 <script>
-    // Karena HTML ini satu server sama API, kita bisa pake "/" aja
-    const BASE_URL = window.location.origin;
-
-    async function ambilSoal() {
-        const res = await fetch(`${BASE_URL}/api/tebak-bendera`);
-        const data = await res.json();
-        const emoji = data.soal.split(' ').pop();
-        document.getElementById('bendera').innerText = emoji;
-        document.getElementById('hint').innerText = data.hint;
-        document.getElementById('hasil').innerText = "";
+    // Ambil data statistik dari API
+    async function updateStats() {
+        try {
+            const res = await fetch('/api/status');
+            const data = await res.json();
+            document.getElementById('reqCount').innerText = data.total_requests;
+            document.getElementById('runtime').innerText = data.runtime;
+            document.getElementById('ramUsage').innerText = data.memory_usage;
+        } catch (e) { console.log("Gagal update stats"); }
     }
-
-    async function jawabSoal() {
-        const jawab = document.getElementById('jawabanInput').value;
-        const res = await fetch(`${BASE_URL}/api/jawab?tebakan=${jawab}`);
-        const data = await res.json();
-        const hasilDiv = document.getElementById('hasil');
-        hasilDiv.innerText = data.message;
-        hasilDiv.style.color = data.status ? "#2ecc71" : "#e74c3c";
-    }
+    
+    // Update tiap 5 detik
+    setInterval(updateStats, 5000);
+    updateStats();
 </script>
 
 </body>
